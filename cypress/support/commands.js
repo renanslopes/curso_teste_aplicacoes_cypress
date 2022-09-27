@@ -27,14 +27,24 @@
 Cypress.Commands.add('getToken', (user, passwd) => {
     cy.request({
         method: 'post',
-        url: 'https://barrigarest.wcaquino.me/signin',
+        url: '/signin',
         body: {
-            email: "user",
+            email: user,
             redirecionar: false,
-            senha: "passwd"
+            senha: passwd
         }
     }).its('body.token').should('not.be.empty')
         .then(token => {
             return token
         })
+})
+
+Cypress.Commands.add('resetRest', () => {
+    cy.getToken('a@a', 'a').then(token => {
+        cy.request({
+            method: 'GET',
+            url: '/reset',
+            headers: { Authorization: `JWT ${token}` }
+        }).its('status').should('be.equal', 200)
+    })
 })
